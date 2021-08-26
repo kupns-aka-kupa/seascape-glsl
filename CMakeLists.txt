@@ -12,7 +12,7 @@ find_package(GLEW REQUIRED)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 14)
 
-set(GLAD_URL https://glad.dav1d.de/generated/tmp_4r_l_uqglad/glad.zip)
+set(GLAD_URL https://glad.dav1d.de/generated/tmpdih3mbb6glad/glad.zip)
 
 ExternalProject_Add(GladExternal
         URL ${GLAD_URL}

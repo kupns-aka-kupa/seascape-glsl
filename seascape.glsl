@@ -6,26 +6,18 @@
 
 #version 330 core
 
-in vec4 vertexColor; // the input variable from the vertex shader (same name and same type)
-out vec4 FragColor;
+in vec4 vertexColor;
+out vec4 fragColor;
 
-uniform vec3      iResolution;           // viewport resolution (in pixels)
-uniform float     iTime;                 // shader playback time (in seconds)
-uniform float     iTimeDelta;            // render time (in seconds)
-uniform int       iFrame;                // shader playback frame
-uniform float     iChannelTime[4];       // channel playback time (in seconds)
-uniform vec3      iChannelResolution[4]; // channel resolution (in pixels)
-uniform vec4      iMouse;                // mouse pixel coords. xy: current (if MLB down), zw: click
-//uniform sampler2  iChannel2;          // input channel. XX = 2D/Cube
-uniform vec4      iDate;                 // (year, month, day, time in seconds)
-uniform float     iSampleRate;           // sound sample rate (i.e., 44100)
-
+uniform ivec2 resolution;
+uniform float time;
+uniform vec2 mouse;
 
 const int NUM_STEPS = 8;
 const float PI	 	= 3.141592;
 const float EPSILON	= 1e-3;
-#define EPSILON_NRM (0.1 / iResolution.x)
-#define AA
+#define EPSILON_NRM (0.1 / resolution.x)
+//#define AA
 
 // sea
 const int ITER_GEOMETRY = 3;
@@ -36,7 +28,7 @@ const float SEA_SPEED = 0.8;
 const float SEA_FREQ = 0.16;
 const vec3 SEA_BASE = vec3(0.0,0.09,0.18);
 const vec3 SEA_WATER_COLOR = vec3(0.8,0.9,0.6)*0.6;
-#define SEA_TIME (1.0 + iTime * SEA_SPEED)
+#define SEA_TIME (1.0 + time * SEA_SPEED)
 const mat2 octave_m = mat2(1.6,1.2,-1.2,1.6);
 
 // math
@@ -189,9 +181,9 @@ float heightMapTracing(vec3 ori, vec3 dir, out vec3 p)
 
 vec3 getPixel(in vec2 coord, float time)
 {
-    vec2 uv = coord / iResolution.xy;
+    vec2 uv = coord / resolution.xy;
     uv = uv * 2.0 - 1.0;
-    uv.x *= iResolution.x / iResolution.y;
+    uv.x *= resolution.x / resolution.y;
 
     // ray
     vec3 ang = vec3(sin(time*3.0)*0.1,sin(time)*0.2+0.3,time);
@@ -214,25 +206,22 @@ vec3 getPixel(in vec2 coord, float time)
 }
 
 // main
-void main(
-//out vec4 fragColor, in vec2 fragCoord
-)
+void main()
 {
-    float time = iTime * 0.3 + iMouse.x*0.01;
+    float t = time * 0.3 + mouse.x*0.1;
 
-//#ifdef AA
-//    vec3 color = vec3(0.0);
-//    for(int i = -1; i <= 1; i++) {
-//        for(int j = -1; j <= 1; j++) {
-//        	vec2 uv = fragCoord+vec2(i,j)/3.0;
-//    		color += getPixel(uv, time);
-//        }
-//    }
-//    color /= 9.0;
-//#else
-//    vec3 color = getPixel(fragCoord, time);
-//#endif
+#ifdef AA
+    vec3 color = vec3(0.0);
+    for(int i = -1; i <= 1; i++) {
+        for(int j = -1; j <= 1; j++) {
+        	vec2 uv = gl_FragCoord.xy+vec2(i,j)/3.0;
+    		color += getPixel(uv, time);
+        }
+    }
+    color /= 9.0;
+#else
+    vec3 color = getPixel(gl_FragCoord.xy, time);
+#endif
 
-//	FragColor = vec4(pow(color,vec3(0.65)), 1.0);
-    FragColor = vec4(pow(vertexColor,vec3(time)), 1.0);
+	fragColor = vec4(pow(color,vec3(0.65)), 1.0);
 }
