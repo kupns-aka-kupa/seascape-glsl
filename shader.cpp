@@ -5,7 +5,6 @@
 
 #include <string>
 #include <fstream>
-#include <sstream>
 #include <iostream>
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
@@ -53,11 +52,11 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     glCompileShader(fragment);
     checkCompileErrors(fragment, "FRAGMENT");
     // shader Program
-    ID = glCreateProgram();
-    glAttachShader(ID, vertex);
-    glAttachShader(ID, fragment);
-    glLinkProgram(ID);
-    checkCompileErrors(ID, "PROGRAM");
+    ProgramId = glCreateProgram();
+    glAttachShader(ProgramId, vertex);
+    glAttachShader(ProgramId, fragment);
+    glLinkProgram(ProgramId);
+    checkCompileErrors(ProgramId, "PROGRAM");
     // delete the shaders as they're linked into our program now and no longer necessary
     glDeleteShader(vertex);
     glDeleteShader(fragment);
@@ -66,23 +65,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 // ------------------------------------------------------------------------
 void Shader::use()
 {
-    glUseProgram(ID);
-}
-// utility uniform functions
-// ------------------------------------------------------------------------
-void Shader::setBool(const std::string &name, bool value) const
-{
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
-}
-// ------------------------------------------------------------------------
-void Shader::setInt(const std::string &name, int value) const
-{
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
-}
-// ------------------------------------------------------------------------
-void Shader::setFloat(const std::string &name, float value) const
-{
-    glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+    glUseProgram(ProgramId);
 }
 
 void Shader::checkCompileErrors(unsigned int shader, std::string type)
@@ -95,7 +78,8 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type)
         if (!success)
         {
             glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-            std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog
+            << "\n -- --------------------------------------------------- -- " << std::endl;
         }
     }
     else
@@ -104,7 +88,8 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type)
         if (!success)
         {
             glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-            std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog
+            << "\n -- --------------------------------------------------- -- " << std::endl;
         }
     }
 }

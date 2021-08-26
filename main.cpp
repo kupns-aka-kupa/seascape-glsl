@@ -50,7 +50,7 @@ int main()
 
     // build and compile our shader program
     // ------------------------------------
-    Shader ourShader("vector_shader.glsl", "seascape.glsl"); // you can name your shader files however you like
+    Shader shader("vector_shader.glsl", "seascape.glsl"); // you can name your shader files however you like
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -109,21 +109,21 @@ int main()
 
         // render
         // ------
-        glUniform1f(glGetUniformLocation(ourShader.ID, "time"), (float)glfwGetTime());
+        shader.setFloat("time", (float)glfwGetTime());
 
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
-        glUniform2f(glGetUniformLocation(ourShader.ID, "mouse"), (float)xpos, (float)ypos);
+        shader.setFloat("mouse", (float)xpos, (float)ypos);
 
         GLint resolution[4];
         glGetIntegerv(GL_VIEWPORT, resolution);
-        glUniform2i(glGetUniformLocation(ourShader.ID, "resolution"), resolution[2], resolution[3]);
+        shader.setInt("resolution",  resolution[2], resolution[3]);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         // render the triangle
-        ourShader.use();
+        shader.use();
         glBindVertexArray(VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
