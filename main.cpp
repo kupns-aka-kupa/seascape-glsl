@@ -10,12 +10,26 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <memory>
+
+#include <fmt/printf.h>
+
 #include <shader.hpp>
 
 #include <osgDB/ReadFile>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
+
+struct GLFWWindowDeleter
+{
+    void operator()(GLFWwindow* ptr) const
+    {
+        glfwDestroyWindow(ptr);
+    }
+};
+
+using GLFWWindowPtr = std::unique_ptr<GLFWwindow, GLFWWindowDeleter>;
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -34,23 +48,23 @@ int main()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    // glfw window creation
-    // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Seascape", NULL, NULL);
-    if (window == NULL)
+    GLFWWindowPtr window(glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, PROJECT_NAME, nullptr, nullptr));
+
+    puts("Failed to create GLFW window");
+    if (window == nullptr)
     {
-        std::cout << "Failed to create GLFW window" << std::endl;
+        puts("Failed to create GLFW window");
         glfwTerminate();
         return -1;
     }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwMakeContextCurrent(window.get());
+    glfwSetFramebufferSizeCallback(window.get(), framebuffer_size_callback);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cout << "Failed to initialize GLAD" << std::endl;
+        puts("Failed to initialize GLAD");
         return -1;
     }
 
@@ -99,33 +113,34 @@ int main()
     int nbFrames = 0;
     // render loop
     // -----------
-    while (!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(window.get()))
     {
 
         double currentTime = glfwGetTime();
         nbFrames++;
         if ( currentTime - lastTime >= 1.0 )
         {
-            printf("%f fps\n", double(nbFrames));
+            fmt::printf("%f fps\n", double(nbFrames));
+
             nbFrames = 0;
             lastTime += 1.0 ;
         }
 
         // input
         // -----
-        processInput(window);
+        processInput(window.get());
 
         // render
         // ------
-        shader.setFloat("time", (float)glfwGetTime());
+        shader.setFloat("iTime", (float)glfwGetTime());
 
         double xpos, ypos;
-        glfwGetCursorPos(window, &xpos, &ypos);
-        shader.setFloat("mouse", (float)xpos, (float)ypos);
+        glfwGetCursorPos(window.get(), &xpos, &ypos);
+        shader.setFloat("iMouse", (float)xpos, (float)ypos);
 
         GLint resolution[4];
         glGetIntegerv(GL_VIEWPORT, resolution);
-        shader.setInt("resolution",  resolution[2], resolution[3]);
+        shader.setInt("iResolution",  resolution[2], resolution[3]);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -138,7 +153,7 @@ int main()
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(window.get());
         glfwPollEvents();
     }
 

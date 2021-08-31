@@ -9,14 +9,14 @@
 in vec4 vertexColor;
 out vec4 fragColor;
 
-uniform ivec2 resolution;
-uniform float time;
-uniform vec2 mouse;
+uniform ivec2 iResolution;
+uniform float iTime;
+uniform vec2 iMouse;
 
 const int NUM_STEPS = 8;
 const float PI	 	= 3.141592;
 const float EPSILON	= 1e-3;
-#define EPSILON_NRM (0.1 / resolution.x)
+#define EPSILON_NRM (0.1 / iResolution.x)
 //#define AA
 
 // sea
@@ -28,7 +28,7 @@ const float SEA_SPEED = 0.8;
 const float SEA_FREQ = 0.16;
 const vec3 SEA_BASE = vec3(0.0,0.09,0.18);
 const vec3 SEA_WATER_COLOR = vec3(0.8,0.9,0.6)*0.6;
-#define SEA_TIME (1.0 + time * SEA_SPEED)
+#define SEA_TIME (1.0 + iTime * SEA_SPEED)
 const mat2 octave_m = mat2(1.6,1.2,-1.2,1.6);
 
 // math
@@ -181,9 +181,9 @@ float heightMapTracing(vec3 ori, vec3 dir, out vec3 p)
 
 vec3 getPixel(in vec2 coord, float time)
 {
-    vec2 uv = coord / resolution.xy;
+    vec2 uv = coord / iResolution.xy;
     uv = uv * 2.0 - 1.0;
-    uv.x *= resolution.x / resolution.y;
+    uv.x *= iResolution.x / iResolution.y;
 
     // ray
     vec3 ang = vec3(sin(time*3.0)*0.1,sin(time)*0.2+0.3,time);
@@ -208,19 +208,19 @@ vec3 getPixel(in vec2 coord, float time)
 // main
 void main()
 {
-    float t = time * 0.3 + mouse.x*0.1;
+    float t = iTime * 0.3 + iMouse.x*0.1;
 
 #ifdef AA
     vec3 color = vec3(0.0);
     for(int i = -1; i <= 1; i++) {
         for(int j = -1; j <= 1; j++) {
         	vec2 uv = gl_FragCoord.xy+vec2(i,j)/3.0;
-    		color += getPixel(uv, time);
+    		color += getPixel(uv, iTime);
         }
     }
     color /= 9.0;
 #else
-    vec3 color = getPixel(gl_FragCoord.xy, time);
+    vec3 color = getPixel(gl_FragCoord.xy, iTime);
 #endif
 
 	fragColor = vec4(pow(color,vec3(0.65)), 1.0);

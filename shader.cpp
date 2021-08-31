@@ -6,6 +6,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <fmt/printf.h>
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
@@ -35,8 +36,12 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     }
     catch (std::ifstream::failure& e)
     {
-        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+        puts("ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ");
     }
+
+    (void)GL_VERTEX_SHADER;
+    (void)GL_FRAGMENT_SHADER;
+
     const char* vShaderCode = vertexCode.c_str();
     const char * fShaderCode = fragmentCode.c_str();
     // 2. compile shaders
@@ -77,9 +82,11 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type)
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success)
         {
-            glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-            std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog
-            << "\n -- --------------------------------------------------- -- " << std::endl;
+            glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
+            fmt::printf("ERROR::SHADER_COMPILATION_ERROR of type: %s"
+                        "%s"
+                        " -- --------------------------------------------------- -- ",
+                        type, infoLog);
         }
     }
     else
@@ -87,9 +94,11 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type)
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success)
         {
-            glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-            std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog
-            << "\n -- --------------------------------------------------- -- " << std::endl;
+            glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
+            fmt::printf("ERROR::PROGRAM_LINKING_ERROR of type: %s"
+                        "%s"
+                        "-- --------------------------------------------------- -- ", type, infoLog
+            );
         }
     }
 }
