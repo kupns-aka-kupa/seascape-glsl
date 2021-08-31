@@ -2,11 +2,17 @@
 #include <cmath>
 #include <gsl/gsl_sf_bessel.h>
 
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <iostream>
 #include <shader.hpp>
+
+#include <osgDB/ReadFile>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -54,14 +60,16 @@ int main()
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float vertices[][3] =
+    ;
+    glm::vec3 vertices[] =
     {
         {1, 1, 0.0f},
         {1, -1, 0.0f},
         {-1, -1, 0.0f},
         {-1, 1, 0.0f}
     };
-    unsigned int indices[][3] =
+
+    glm::vec<3, uint32_t> indices[] =
     {
         {0, 1, 3},
         {1, 2, 3}
