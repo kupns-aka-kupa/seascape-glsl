@@ -11,6 +11,7 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(Freetype REQUIRED)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
@@ -42,6 +43,7 @@ target_include_directories(${PROJECT_NAME}
         ${GLAD_INCLUDE_DIRECTORIES}
         ${GSL_INCLUDE_DIRS}
         ${GLM_INCLUDE_DIRS}
+        ${FREETYPE_INCLUDE_DIRS}
         ${OPENSCENEGRAPH_INCLUDE_DIRS}
         ${OPENGL_INCLUDE_DIR}
         ${GLEW_INCLUDE_DIRS})
@@ -54,6 +56,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         glfw
         ${GSL_LIBRARIES}
+        ${FREETYPE_LIBRARIES}
         ${OPENGL_LIBRARIES}
         ${OPENSCENEGRAPH_LIBRARIES}
         ${GLEW_LIBRARIES}
