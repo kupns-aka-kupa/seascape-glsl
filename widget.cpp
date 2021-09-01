@@ -1,6 +1,7 @@
 #include "widget.hpp"
 
 #include <QMouseEvent>
+#include <QDateTime>
 #include <QOpenGLShaderProgram>
 #include <QCoreApplication>
 #include <Qt3DRender/QMesh>
@@ -93,21 +94,10 @@ void GLWidget::initializeGL()
 
     glClearColor(0, 0, 0, _transparent ? 0 : 1);
 
-    QFile vertexFile(":/shaders/vector/vector_v2.glsl");
-
-    vertexFile.open(QFile::ReadOnly | QFile::Text);
-
-    QTextStream in(&vertexFile);
-
     _program = new QOpenGLShaderProgram;
-    _program->addShaderFromSourceCode(QOpenGLShader::Vertex, in.readAll());
+    _program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertex/transpose");
+    _program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragment/seascape");
 
-    QFile fragmentFile(":/shaders/fragment/fragment_v2.glsl");
-    fragmentFile.open(QFile::ReadOnly | QFile::Text);
-    in.reset();
-    in.setDevice(&fragmentFile);
-
-    _program->addShaderFromSourceCode(QOpenGLShader::Fragment, in.readAll());
     _program->bindAttributeLocation("vertex", 0);
     _program->bindAttributeLocation("normal", 1);
     _program->link();
@@ -116,6 +106,11 @@ void GLWidget::initializeGL()
     _projMatrixLoc = _program->uniformLocation("projMatrix");
     _mvMatrixLoc = _program->uniformLocation("mvMatrix");
     _normalMatrixLoc = _program->uniformLocation("normalMatrix");
+
+    _timeLoc = _program->uniformLocation("iTime");
+    _resolutionLoc = _program->uniformLocation("iResolution");
+    _mouseLoc = _program->uniformLocation("iMouse");
+
     _lightPosLoc = _program->uniformLocation("lightPos");
 
     // Create a vertex array object. In OpenGL ES 2.0 and OpenGL 2.x
@@ -171,6 +166,12 @@ void GLWidget::paintGL()
     _program->bind();
     _program->setUniformValue(_projMatrixLoc, _proj);
     _program->setUniformValue(_mvMatrixLoc, _camera * _world);
+    _program->setUniformValue(_timeLoc, (float)QDateTime::currentSecsSinceEpoch());
+
+    _program->setUniformValue(_resolutionLoc, QVector2D(geometry().bottomRight()));
+
+    _program->setUniformValue(_mouseLoc, QVector2D(QCursor::pos()));
+
     QMatrix3x3 normalMatrix = _world.normalMatrix();
     _program->setUniformValue(_normalMatrixLoc, normalMatrix);
 
@@ -187,13 +188,13 @@ void GLWidget::resizeGL(int w, int h)
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
-    m_lastPos = event->pos();
+    _lastPos = event->pos();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    int dx = event->x() - m_lastPos.x();
-    int dy = event->y() - m_lastPos.y();
+    int dx = event->x() - _lastPos.x();
+    int dy = event->y() - _lastPos.y();
 
     if (event->buttons() & Qt::LeftButton) {
         setXRotation(_xRot + 8 * dy);
@@ -202,6 +203,6 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         setXRotation(_xRot + 8 * dy);
         setZRotation(_zRot + 8 * dx);
     }
-    m_lastPos = event->pos();
+    _lastPos = event->pos();
 }
 

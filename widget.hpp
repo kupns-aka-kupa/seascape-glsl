@@ -49,12 +49,15 @@ private:
     int _xRot = 0;
     int _yRot = 0;
     int _zRot = 0;
-    QPoint m_lastPos;
+    QPoint _lastPos;
     Logo _logo;
     QOpenGLVertexArrayObject _vao;
     QOpenGLBuffer _logoVbo;
     QOpenGLShaderProgram *_program = nullptr;
     int _projMatrixLoc = 0;
+    int _timeLoc = 0;
+    int _resolutionLoc = 0;
+    int _mouseLoc = 0;
     int _mvMatrixLoc = 0;
     int _normalMatrixLoc = 0;
     int _lightPosLoc = 0;
