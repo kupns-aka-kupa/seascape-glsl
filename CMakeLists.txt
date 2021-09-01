@@ -8,15 +8,19 @@ find_package(GSL REQUIRED)
 find_package(glm REQUIRED)
 find_package(OpenSceneGraph REQUIRED COMPONENTS osgDB)
 find_package(OpenGL REQUIRED)
-find_package(glfw3 REQUIRED)
-find_package(fmt REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(Freetype REQUIRED)
+
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Widgets REQUIRED)
+
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 
-set(GLAD_URL https://glad.dav1d.de/generated/tmpg_m4gwk2glad/glad.zip)
+set(GLAD_URL https://glad.dav1d.de/generated/tmpdm5xpoosglad/glad.zip)
 
 ExternalProject_Add(GladExternal
         URL ${GLAD_URL}
@@ -30,7 +34,7 @@ ExternalProject_Get_Property(GladExternal SOURCE_DIR)
 set(GLAD_INCLUDE_DIRECTORIES ${SOURCE_DIR}/include)
 file(GLOB_RECURSE GLAD_FILES ${SOURCE_DIR}/*)
 
-file(GLOB SHADER_FILES *.glsl)
+file(GLOB SHADER_FILES shaders/*.glsl)
 file(COPY ${SHADER_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/obj DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -54,12 +58,11 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        glfw
+        Qt${QT_VERSION_MAJOR}::Core
+        Qt${QT_VERSION_MAJOR}::Widgets
         ${GSL_LIBRARIES}
-        ${FREETYPE_LIBRARIES}
         ${OPENGL_LIBRARIES}
         ${OPENSCENEGRAPH_LIBRARIES}
         ${GLEW_LIBRARIES}
         glm::glm
-        fmt::fmt
         ${CMAKE_DL_LIBS})

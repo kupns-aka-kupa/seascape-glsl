@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <fmt/printf.h>
+#include <QDebug>
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
@@ -83,10 +84,10 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type)
         if (!success)
         {
             glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            fmt::printf("ERROR::SHADER_COMPILATION_ERROR of type: %s"
+            qInfo("ERROR::SHADER_COMPILATION_ERROR of type: %s"
                         "%s"
                         " -- --------------------------------------------------- -- ",
-                        type, infoLog);
+                        type.c_str(), infoLog);
         }
     }
     else
@@ -95,9 +96,9 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type)
         if (!success)
         {
             glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            fmt::printf("ERROR::PROGRAM_LINKING_ERROR of type: %s"
+            qInfo("ERROR::PROGRAM_LINKING_ERROR of type: %s"
                         "%s"
-                        "-- --------------------------------------------------- -- ", type, infoLog
+                        "-- --------------------------------------------------- -- ", type.c_str(), infoLog
             );
         }
     }
