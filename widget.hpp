@@ -19,8 +19,8 @@ public:
     GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
 
-    static bool isTransparent() { return m_transparent; }
-    static void setTransparent(bool t) { m_transparent = t; }
+    static bool isTransparent() { return _transparent; }
+    static void setTransparent(bool t) { _transparent = t; }
 
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
@@ -46,21 +46,21 @@ protected:
 private:
     void setupVertexAttribs();
 
-    int m_xRot = 0;
-    int m_yRot = 0;
-    int m_zRot = 0;
+    int _xRot = 0;
+    int _yRot = 0;
+    int _zRot = 0;
     QPoint m_lastPos;
-    Logo m_logo;
-    QOpenGLVertexArrayObject m_vao;
-    QOpenGLBuffer m_logoVbo;
-    QOpenGLShaderProgram *m_program = nullptr;
-    int m_projMatrixLoc = 0;
-    int m_mvMatrixLoc = 0;
-    int m_normalMatrixLoc = 0;
-    int m_lightPosLoc = 0;
-    QMatrix4x4 m_proj;
-    QMatrix4x4 m_camera;
-    QMatrix4x4 m_world;
-    static bool m_transparent;
+    Logo _logo;
+    QOpenGLVertexArrayObject _vao;
+    QOpenGLBuffer _logoVbo;
+    QOpenGLShaderProgram *_program = nullptr;
+    int _projMatrixLoc = 0;
+    int _mvMatrixLoc = 0;
+    int _normalMatrixLoc = 0;
+    int _lightPosLoc = 0;
+    QMatrix4x4 _proj;
+    QMatrix4x4 _camera;
+    QMatrix4x4 _world;
+    static bool _transparent;
 };
 #endif //SEASCAPE_WIDGET_HPP

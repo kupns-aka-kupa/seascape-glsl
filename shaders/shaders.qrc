@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/shaders/fragment">
+        <file alias="clouds">clouds.glsl</file>
+        <file alias="seascape">seascape.glsl</file>
+        <file>fragment_v2.glsl</file>
+    </qresource>
+    <qresource prefix="/shaders/vector">
+        <file alias="vector">vector_shader.glsl</file>
+        <file>vector_v2.glsl</file>
+    </qresource>
+</RCC>

@@ -10,14 +10,15 @@ find_package(OpenSceneGraph REQUIRED COMPONENTS osgDB)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Widgets REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Widgets REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Widgets OpenGL 3DCore 3DRender REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Widgets OpenGL 3DCore 3DRender REQUIRED)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 
 set(GLAD_URL https://glad.dav1d.de/generated/tmpdm5xpoosglad/glad.zip)
@@ -34,12 +35,13 @@ ExternalProject_Get_Property(GladExternal SOURCE_DIR)
 set(GLAD_INCLUDE_DIRECTORIES ${SOURCE_DIR}/include)
 file(GLOB_RECURSE GLAD_FILES ${SOURCE_DIR}/*)
 
-file(GLOB SHADER_FILES shaders/*.glsl)
-file(COPY ${SHADER_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/obj DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
 file(GLOB SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
-add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${GLAD_FILES})
+set(RESOURCE_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/shaders/shaders.qrc
+#        ${CMAKE_CURRENT_SOURCE_DIR}/obj/obj.qrc
+        )
+
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${RESOURCE_FILES} ${GLAD_FILES})
 add_dependencies(${PROJECT_NAME} GladExternal)
 
 target_include_directories(${PROJECT_NAME}
@@ -60,6 +62,9 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         Qt${QT_VERSION_MAJOR}::Core
         Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::OpenGL
+        Qt${QT_VERSION_MAJOR}::3DCore
+        Qt${QT_VERSION_MAJOR}::3DRender
         ${GSL_LIBRARIES}
         ${OPENGL_LIBRARIES}
         ${OPENSCENEGRAPH_LIBRARIES}

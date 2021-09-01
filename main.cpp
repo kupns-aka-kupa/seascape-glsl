@@ -1,21 +1,7 @@
-#include <cstdio>
 #include <cmath>
-#include <gsl/gsl_sf_bessel.h>
-
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
-
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include <iostream>
 #include <memory>
-
-#include <fmt/printf.h>
-
 #include <shader.hpp>
-
 #include <osgDB/ReadFile>
 
 #include <QApplication>
@@ -31,8 +17,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    QCoreApplication::setApplicationName("Qt Hello GL 2 Example");
-    QCoreApplication::setOrganizationName("QtProject");
+    QCoreApplication::setApplicationName(PROJECT_NAME);
     QCoreApplication::setApplicationVersion(PROJECT_VERSION);
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());
