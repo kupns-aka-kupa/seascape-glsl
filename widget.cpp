@@ -5,17 +5,22 @@
 #include <QOpenGLShaderProgram>
 #include <QCoreApplication>
 #include <Qt3DRender/QMesh>
+#include <QPainter>
 
 bool GLWidget::_transparent = false;
 
 GLWidget::GLWidget(QWidget *parent)
-        : QOpenGLWidget(parent)
+: QOpenGLWidget(parent)
+, _program(nullptr)
+, _vbo(QOpenGLBuffer::VertexBuffer)
+, _ebo(QOpenGLBuffer::IndexBuffer)
 {
     if (_transparent) {
         QSurfaceFormat fmt = format();
         fmt.setAlphaBufferSize(8);
         setFormat(fmt);
     }
+    _timer.start();
 }
 
 GLWidget::~GLWidget()
@@ -76,12 +81,12 @@ void GLWidget::cleanup()
     if (_program == nullptr)
         return;
     makeCurrent();
-    _logoVbo.destroy();
+    _vbo.destroy();
+    _ebo.destroy();
     delete _program;
     _program = nullptr;
     doneCurrent();
 }
-
 
 void GLWidget::initializeGL()
 {
@@ -100,9 +105,17 @@ void GLWidget::initializeGL()
 
     _program->bindAttributeLocation("vertex", 0);
     _program->bindAttributeLocation("normal", 1);
-    _program->link();
 
-    _program->bind();
+    if (!_program->link())
+    {
+        close();
+    }
+
+    if (!_program->bind())
+    {
+        close();
+    }
+
     _projMatrixLoc = _program->uniformLocation("projMatrix");
     _mvMatrixLoc = _program->uniformLocation("mvMatrix");
     _normalMatrixLoc = _program->uniformLocation("normalMatrix");
@@ -120,13 +133,40 @@ void GLWidget::initializeGL()
     _vao.create();
     QOpenGLVertexArrayObject::Binder vaoBinder(&_vao);
 
-    // Setup our vertex buffer object.
-    _logoVbo.create();
-    _logoVbo.bind();
-    _logoVbo.allocate(_logo.constData(), _logo.count() * sizeof(GLfloat));
+    QVector3D vertices[] =
+    {
+        {-1, -1, 0.0f},
+        {1, -1, 0.0f},
+        {1, 1, 0.0f},
+        {-1, 1, 0.0f},
+    };
 
-    // Store the vertex attribute bindings for the program.
-    setupVertexAttribs();
+    QVector3D indices[] =
+    {
+        {0, 1, 2},
+        {0, 2, 3}
+    };
+
+    // Setup our vertex buffer object.
+    _vbo.create();
+    _vbo.bind();
+    _vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
+//    _vbo.allocate(_logo.constData(), _logo.count() * sizeof(GLfloat));
+    _vbo.allocate(vertices, sizeof(vertices));
+
+    glEnableVertexAttribArray(0);
+//    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(QVector3D), nullptr);
+//    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat),
+//                          reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+
+    _vbo.release();
+
+    _ebo.create();
+    _ebo.bind();
+    _ebo.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    _ebo.allocate(indices, sizeof(indices));
+    _ebo.release();
 
     // Our camera never changes in this example.
     _camera.setToIdentity();
@@ -138,21 +178,11 @@ void GLWidget::initializeGL()
     _program->release();
 }
 
-void GLWidget::setupVertexAttribs()
-{
-    _logoVbo.bind();
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-    f->glEnableVertexAttribArray(0);
-    f->glEnableVertexAttribArray(1);
-    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat),
-                             nullptr);
-    f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat),
-                             reinterpret_cast<void *>(3 * sizeof(GLfloat)));
-    _logoVbo.release();
-}
-
 void GLWidget::paintGL()
 {
+    Q_ASSERT(_vbo.isCreated());
+    Q_ASSERT(_vao.isCreated());
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -164,20 +194,31 @@ void GLWidget::paintGL()
 
     QOpenGLVertexArrayObject::Binder vaoBinder(&_vao);
     _program->bind();
-    _program->setUniformValue(_projMatrixLoc, _proj);
-    _program->setUniformValue(_mvMatrixLoc, _camera * _world);
-    _program->setUniformValue(_timeLoc, (float)QDateTime::currentSecsSinceEpoch());
-
+    _ebo.bind();
+//    _program->setUniformValue(_projMatrixLoc, _proj);
+//    _program->setUniformValue(_mvMatrixLoc, _camera * _world);
+    _program->setUniformValue(_timeLoc, (float)_timer.elapsed());
     _program->setUniformValue(_resolutionLoc, QVector2D(geometry().bottomRight()));
-
     _program->setUniformValue(_mouseLoc, QVector2D(QCursor::pos()));
+//    _program->setUniformValue(_normalMatrixLoc, _world.normalMatrix());
 
-    QMatrix3x3 normalMatrix = _world.normalMatrix();
-    _program->setUniformValue(_normalMatrixLoc, normalMatrix);
-
-    glDrawArrays(GL_TRIANGLES, 0, _logo.vertexCount());
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+//    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
     _program->release();
+}
+
+void GLWidget::paintEvent(QPaintEvent *event)
+{
+    QOpenGLWidget::paintEvent(event);
+//    QPainter painter;
+//
+//    painter.begin(this);
+//    painter.fillRect(QRect(0, 0, 100, 100), QBrush(QColor(0,0,0)));
+//    painter.setRenderHint(QPainter::Antialiasing);
+//    painter.drawText(QRect(0, 0, 100, 100), Qt::AlignCenter, QString::number(_timer.elapsed()));
+//    painter.end();
+//    update();
 }
 
 void GLWidget::resizeGL(int w, int h)

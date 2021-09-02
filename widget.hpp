@@ -5,6 +5,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
+#include <QElapsedTimer>
 #include <QMatrix4x4>
 
 #include "logo.hpp"
@@ -26,17 +27,18 @@ public:
     QSize sizeHint() const override;
 
 public slots:
-            void setXRotation(int angle);
+    void setXRotation(int angle);
     void setYRotation(int angle);
     void setZRotation(int angle);
     void cleanup();
 
-    signals:
+signals:
     void xRotationChanged(int angle);
     void yRotationChanged(int angle);
     void zRotationChanged(int angle);
 
 protected:
+    void paintEvent(QPaintEvent *event) override;
     void initializeGL() override;
     void paintGL() override;
     void resizeGL(int width, int height) override;
@@ -44,7 +46,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
-    void setupVertexAttribs();
+    QElapsedTimer _timer;
 
     int _xRot = 0;
     int _yRot = 0;
@@ -52,8 +54,9 @@ private:
     QPoint _lastPos;
     Logo _logo;
     QOpenGLVertexArrayObject _vao;
-    QOpenGLBuffer _logoVbo;
-    QOpenGLShaderProgram *_program = nullptr;
+    QOpenGLBuffer _ebo;
+    QOpenGLBuffer _vbo;
+    QOpenGLShaderProgram *_program;
     int _projMatrixLoc = 0;
     int _timeLoc = 0;
     int _resolutionLoc = 0;

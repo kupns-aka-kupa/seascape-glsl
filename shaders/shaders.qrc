@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/shaders/fragment">
         <file alias="clouds">clouds.glsl</file>
+        <file alias="const_color">const_color.glsl</file>
         <file alias="seascape">seascape.glsl</file>
         <file alias="light">light.glsl</file>
     </qresource>

@@ -6,8 +6,8 @@
 
 #version 330 core
 
-in vec4 vertexColor;
-out vec4 fragColor;
+out highp vec4 fragColor;
+uniform highp vec3 lightPos;
 
 uniform ivec2 iResolution;
 uniform float iTime;
@@ -224,4 +224,5 @@ void main()
 #endif
 
 	fragColor = vec4(pow(color,vec3(0.65)), 1.0);
+    fragColor = vec4(1);
 }
