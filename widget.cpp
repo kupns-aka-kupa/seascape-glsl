@@ -131,6 +131,8 @@ void GLWidget::initializeGL()
     // at all. Nonetheless the below code works in all cases and makes
     // sure there is a VAO when one is needed.
     _vao.create();
+    _vbo.create();
+    _ebo.create();
     QOpenGLVertexArrayObject::Binder vaoBinder(&_vao);
 
     QVector3D vertices[] =
@@ -148,21 +150,20 @@ void GLWidget::initializeGL()
     };
 
     // Setup our vertex buffer object.
-    _vbo.create();
     _vbo.bind();
     _vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
 //    _vbo.allocate(_logo.constData(), _logo.count() * sizeof(GLfloat));
     _vbo.allocate(vertices, sizeof(vertices));
 
-    glEnableVertexAttribArray(0);
+    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+    f->glEnableVertexAttribArray(0);
 //    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(QVector3D), nullptr);
+    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(QVector3D), nullptr);
 //    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat),
 //                          reinterpret_cast<void *>(3 * sizeof(GLfloat)));
 
     _vbo.release();
 
-    _ebo.create();
     _ebo.bind();
     _ebo.setUsagePattern(QOpenGLBuffer::StaticDraw);
     _ebo.allocate(indices, sizeof(indices));
@@ -202,8 +203,8 @@ void GLWidget::paintGL()
     _program->setUniformValue(_mouseLoc, QVector2D(QCursor::pos()));
 //    _program->setUniformValue(_normalMatrixLoc, _world.normalMatrix());
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-//    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+//    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
     _program->release();
 }
