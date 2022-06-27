@@ -3,9 +3,11 @@
         <file alias="clouds">clouds.glsl</file>
         <file alias="seascape">seascape.glsl</file>
         <file alias="light">light.glsl</file>
+        <file>fragment_v2.glsl</file>
     </qresource>
     <qresource prefix="/shaders/vertex">
         <file alias="transpose">transpose.glsl</file>
         <file alias="rotation">rotation.glsl</file>
+        <file>vector_v2.glsl</file>
     </qresource>
 </RCC>

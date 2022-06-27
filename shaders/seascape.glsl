@@ -6,8 +6,11 @@
 
 #version 330 core
 
+in highp vec3 vert;
+in highp vec3 vertNormal;
 in vec4 vertexColor;
 out vec4 fragColor;
+uniform highp vec3 lightPos;
 
 uniform ivec2 iResolution;
 uniform float iTime;

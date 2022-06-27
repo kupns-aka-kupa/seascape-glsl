@@ -21,7 +21,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 
-set(GLAD_URL https://glad.dav1d.de/generated/tmpdm5xpoosglad/glad.zip)
+set(GLAD_URL https://glad.dav1d.de/generated/tmp5_gi6ks8glad/glad.zip)
 
 ExternalProject_Add(GladExternal
         URL ${GLAD_URL}

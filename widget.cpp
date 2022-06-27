@@ -95,8 +95,8 @@ void GLWidget::initializeGL()
     glClearColor(0, 0, 0, _transparent ? 0 : 1);
 
     _program = new QOpenGLShaderProgram;
-    _program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertex/transpose");
-    _program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragment/seascape");
+    _program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertex/vector_v2.glsl");
+    _program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragment/fragment_v2.glsl");
 
     _program->bindAttributeLocation("vertex", 0);
     _program->bindAttributeLocation("normal", 1);
