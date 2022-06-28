@@ -1,0 +1,28 @@
+{
+  "name": "rosgis-theme",
+  "version": "0.0.1",
+  "description": "Procedural login page background",
+  "keywords": [
+    "blender",
+    "glsl",
+    "three"
+  ],
+  "license": "",
+  "author": "nkupreenkov",
+  "scripts": {
+    "format": "clang-format -i shaders/*.glsl",
+    "copy": "rsync resources shaders dist -r",
+    "build": "npm run copy && parcel build index.html",
+    "dev": "parcel index.html --open",
+    "start": "npm run build && npm run dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "glslify-bundle": "^5.1.1",
+    "glslify-deps": "^1.3.2",
+    "parcel-bundler": "^1.12.4"
+  },
+  "dependencies": {
+    "three": "^0.142.0"
+  }
+}
